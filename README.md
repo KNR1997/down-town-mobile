@@ -1,29 +1,34 @@
-# model-project
+# down-town-mobiles
 
-This template should help get you started developing with Vue 3 in Vite.
+An Electron application with React and TypeScript
 
 ## Recommended IDE Setup
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vitejs.dev/config/).
+- [VSCode](https://code.visualstudio.com/) + [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) + [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
 
 ## Project Setup
 
-```sh
-npm install
+### Install
+
+```bash
+$ yarn
 ```
 
-### Compile and Hot-Reload for Development
+### Development
 
-```sh
-npm run dev
+```bash
+$ yarn dev
 ```
 
-### Compile and Minify for Production
+### Build
 
-```sh
-npm run build
+```bash
+# For windows
+$ yarn build:win
+
+# For macOS
+$ yarn build:mac
+
+# For Linux
+$ yarn build:linux
 ```
