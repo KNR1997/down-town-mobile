@@ -199,6 +199,7 @@ export interface LoginInput {
 
 export interface AuthResponse {
   token: string;
+  tokens: { access: string; refresh: string };
   permissions: string[];
   role: string;
 }

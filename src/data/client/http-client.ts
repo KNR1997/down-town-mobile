@@ -1,3 +1,4 @@
+import { handleTokenRefresh } from '@/lib/refresh-manager';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import Router from 'next/router';
@@ -30,21 +31,21 @@ Axios.interceptors.request.use((config) => {
   return config;
 });
 
-// Change response data/error here
 Axios.interceptors.response.use(
   (response) => response,
-  (error) => {
-    if (
-      (error.response && error.response.status === 401) ||
-      (error.response && error.response.status === 403) ||
-      (error.response &&
-        error.response.data.message === 'PICKBAZAR_ERROR.NOT_AUTHORIZED')
-    ) {
-      Cookies.remove(AUTH_TOKEN_KEY);
-      Router.reload();
+  async (error) => {
+    const status = error.response?.status;
+    if (status === 401) {
+      try {
+        return await handleTokenRefresh(error);
+      } catch (refreshError) {
+        Cookies.remove(AUTH_TOKEN_KEY);
+        Router.push("/login");
+        return Promise.reject(refreshError);
+      }
     }
     return Promise.reject(error);
-  },
+  }
 );
 
 function formatBooleanSearchParam(key: string, value: boolean) {
