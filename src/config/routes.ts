@@ -25,6 +25,9 @@ export const Routes = {
   user: {
     ...routesFactory('/users'),
   },
+  customer: {
+    ...routesFactory('/customers'),
+  },
   type: {
     ...routesFactory('/groups'),
   },

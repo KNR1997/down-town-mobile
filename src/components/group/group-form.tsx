@@ -243,7 +243,7 @@ export default function CreateOrUpdateTypeForm({ initialValues }: IProps) {
     const input = {
       language: router.locale,
       name: values.name!,
-      slug: values.slug!,
+      slug: slugAutoSuggest,
       icon: values.icon?.value,
       settings: {
         isHome: values?.settings?.isHome,

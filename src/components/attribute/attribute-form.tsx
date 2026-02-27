@@ -1,26 +1,35 @@
-import Input from '@/components/ui/input';
-import { useFieldArray, useForm } from 'react-hook-form';
-import Button from '@/components/ui/button';
-import Description from '@/components/ui/description';
-import Card from '@/components/common/card';
-import { useRouter } from 'next/router';
-import { useTranslation } from 'next-i18next';
-import { Attribute } from '@/types';
-import { useShopQuery } from '@/data/shop';
 import { useState } from 'react';
-import Alert from '@/components/ui/alert';
+import { useRouter } from 'next/router';
+import { useShopQuery } from '@/data/shop';
 import { animateScroll } from 'react-scroll';
+import { useTranslation } from 'next-i18next';
+import { Attribute, AttributeValue } from '@/types';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { useFieldArray, useForm } from 'react-hook-form';
+// hooks
 import {
   useCreateAttributeMutation,
   useUpdateAttributeMutation,
 } from '@/data/attributes';
-import { yupResolver } from '@hookform/resolvers/yup';
-import { attributeValidationSchema } from '@/components/attribute/attribute.validation-schema';
+// components
+import Input from '@/components/ui/input';
+import Alert from '@/components/ui/alert';
+import Button from '@/components/ui/button';
+import Card from '@/components/common/card';
+import Description from '@/components/ui/description';
 import StickyFooterPanel from '@/components/ui/sticky-footer-panel';
+import { attributeValidationSchema } from '@/components/attribute/attribute.validation-schema';
+
+interface AttributeValueCustom extends Omit<AttributeValue, 'id' | ''> {
+  db_id: string;
+  value: string;
+  meta: string;
+  id: string | null;
+}
 
 type FormValues = {
   name?: string | null;
-  values: any;
+  values: AttributeValueCustom[];
 };
 
 type IProps = {
@@ -28,38 +37,61 @@ type IProps = {
 };
 export default function CreateOrUpdateAttributeForm({ initialValues }: IProps) {
   const router = useRouter();
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-
+  const { t } = useTranslation();
   const {
     query: { shop },
   } = router;
-  const { t } = useTranslation();
+  // states
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [removedItemIds, setRemovedItemIds] = useState<string[]>([]);
+  // query
   const { data: shopData } = useShopQuery(
     {
       slug: shop as string,
     },
     { enabled: !!shop },
   );
-
   const shopId = shopData?.id!;
+  // mutations
+  const { mutate: createAttribute, isLoading: creating } =
+    useCreateAttributeMutation();
+  const { mutate: updateAttribute, isLoading: updating } =
+    useUpdateAttributeMutation();
+
   const {
     register,
     handleSubmit,
     control,
     formState: { errors },
   } = useForm<FormValues>({
-    defaultValues: initialValues ? initialValues : { name: '', values: [] },
+    defaultValues: initialValues
+      ? {
+          ...initialValues,
+          values: initialValues.values.map((item) => ({
+            db_id: item.id,
+            value: item.value,
+            meta: item.meta,
+          })),
+        }
+      : { name: '', values: [] },
     //@ts-ignore
     resolver: yupResolver(attributeValidationSchema),
   });
+
   const { fields, append, remove } = useFieldArray({
     control,
     name: 'values',
   });
-  const { mutate: createAttribute, isLoading: creating } =
-    useCreateAttributeMutation();
-  const { mutate: updateAttribute, isLoading: updating } =
-    useUpdateAttributeMutation();
+
+  const handleRemoveItem = (index: number) => {
+    const removedItem = fields[index];
+    if (removedItem?.db_id) {
+      let removeId = removedItem.db_id;
+      setRemovedItemIds((prev) => [...prev, removeId]);
+    }
+    remove(index);
+  };
+
   const onSubmit = (values: FormValues) => {
     if (
       !initialValues ||
@@ -86,18 +118,20 @@ export default function CreateOrUpdateAttributeForm({ initialValues }: IProps) {
       );
     } else {
       updateAttribute({
-        id: initialValues.id!,
+        id: initialValues.slug!,
         name: values.name!,
         shop_id: Number(initialValues?.shop_id),
-        values: values.values.map(({ id, value, meta }: any) => ({
+        values: values.values.map(({ id, db_id, value, meta }: any) => ({
           language: router.locale,
-          id: Number(id),
+          id: db_id == '' ? null : db_id,
           value,
           meta,
         })),
+        deleted_values: removedItemIds,
       });
     }
   };
+
   return (
     <>
       {errorMessage ? (
@@ -152,6 +186,10 @@ export default function CreateOrUpdateAttributeForm({ initialValues }: IProps) {
                 >
                   <div className="grid grid-cols-1 gap-5 sm:grid-cols-5">
                     <Input
+                      {...register(`values.${index}.db_id` as const)}
+                      className="hidden"
+                    />
+                    <Input
                       className="sm:col-span-2"
                       label={t('form:input-label-value')}
                       variant="outline"
@@ -170,7 +208,7 @@ export default function CreateOrUpdateAttributeForm({ initialValues }: IProps) {
                       error={t(errors?.values?.[index]?.meta?.message)}
                     />
                     <button
-                      onClick={() => remove(index)}
+                      onClick={() => handleRemoveItem(index)}
                       type="button"
                       className="text-sm text-red-500 transition-colors duration-200 hover:text-red-700 focus:outline-none sm:col-span-1 sm:mt-4"
                     >
@@ -183,7 +221,14 @@ export default function CreateOrUpdateAttributeForm({ initialValues }: IProps) {
 
             <Button
               type="button"
-              onClick={() => append({ value: '', meta: '' })}
+              onClick={() =>
+                append({
+                  id: null,
+                  db_id: '',
+                  value: '',
+                  meta: '',
+                })
+              }
               className="w-full sm:w-auto"
             >
               {t('form:button-label-add-value')}

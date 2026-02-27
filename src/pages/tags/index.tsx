@@ -1,43 +1,41 @@
+import { useState } from 'react';
+import { Config } from '@/config';
+import { useRouter } from 'next/router';
+import { useTagsQuery } from '@/data/tag';
+import { Routes } from '@/config/routes';
+import { SortOrder, Type } from '@/types';
+import { useTranslation } from 'next-i18next';
+import { adminOnly } from '@/utils/auth-utils';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+// components
 import Card from '@/components/common/card';
+import TagList from '@/components/tag/tag-list';
 import Layout from '@/components/layouts/admin';
 import Search from '@/components/common/search';
-import LinkButton from '@/components/ui/link-button';
-import { useState } from 'react';
-import ErrorMessage from '@/components/ui/error-message';
 import Loader from '@/components/ui/loader/loader';
-import { useTranslation } from 'next-i18next';
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import TagList from '@/components/tag/tag-list';
-import { adminOnly } from '@/utils/auth-utils';
-import { SortOrder, Type } from '@/types';
-import { Routes } from '@/config/routes';
-import { useTagsQuery } from '@/data/tag';
-import { useRouter } from 'next/router';
-import { Config } from '@/config';
+import LinkButton from '@/components/ui/link-button';
+import ErrorMessage from '@/components/ui/error-message';
 import PageHeading from '@/components/common/page-heading';
 import TypeFilter from '@/components/category/type-filter';
 
 export default function Tags() {
   const { t } = useTranslation();
   const { locale } = useRouter();
+  // states
   const [searchTerm, setSearchTerm] = useState('');
   const [type, setType] = useState('');
   const [page, setPage] = useState(1);
   const [orderBy, setOrder] = useState('created_at');
   const [sortedBy, setColumn] = useState<SortOrder>(SortOrder.Desc);
-  const {
-    tags,
-    loading: loading,
-    paginatorInfo,
-    error,
-  } = useTagsQuery({
+  // query
+  const { tags, loading, paginatorInfo, error } = useTagsQuery({
     limit: 10,
     orderBy,
     sortedBy,
     name: searchTerm,
     page,
     language: locale,
-    type,
+    type__slug: type,
   });
 
   if (loading) return <Loader text={t('common:text-loading')} />;

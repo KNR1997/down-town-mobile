@@ -1,21 +1,25 @@
-import Card from '@/components/common/card';
-import Search from '@/components/common/search';
-import { ArrowDown } from '@/components/icons/arrow-down';
-import { ArrowUp } from '@/components/icons/arrow-up';
-import Layout from '@/components/layouts/admin';
-import CategoryTypeFilter from '@/components/filters/category-type-filter';
-import ProductList from '@/components/product/product-list';
-import ErrorMessage from '@/components/ui/error-message';
-import Loader from '@/components/ui/loader/loader';
-import { useProductsQuery } from '@/data/product';
-import { Category, ProductType, SortOrder, Type } from '@/types';
-import { adminOnly } from '@/utils/auth-utils';
 import cn from 'classnames';
+import { useState } from 'react';
+import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import { useRouter } from 'next/router';
-import { useState } from 'react';
+// types
+import { Category, ProductType, SortOrder, Type } from '@/types';
+// utils
+import { adminOnly } from '@/utils/auth-utils';
+// hooks
+import { useProductsQuery } from '@/data/product';
+// components
+import Card from '@/components/common/card';
+import Search from '@/components/common/search';
+import Layout from '@/components/layouts/admin';
+import Loader from '@/components/ui/loader/loader';
+import { ArrowUp } from '@/components/icons/arrow-up';
+import ErrorMessage from '@/components/ui/error-message';
+import { ArrowDown } from '@/components/icons/arrow-down';
 import PageHeading from '@/components/common/page-heading';
+import ProductList from '@/components/product/product-list';
+import CategoryTypeFilter from '@/components/filters/category-type-filter';
 
 interface ProductTypeOptions {
   name: string;
@@ -23,16 +27,17 @@ interface ProductTypeOptions {
 }
 
 export default function ProductsPage() {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [type, setType] = useState('');
-  const [category, setCategory] = useState('');
-  const [productType, setProductType] = useState('');
-  const [page, setPage] = useState(1);
   const { t } = useTranslation();
   const { locale } = useRouter();
+  // states
+  const [page, setPage] = useState(1);
+  const [type, setType] = useState('');
+  const [category, setCategory] = useState('');
+  const [visible, setVisible] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [productType, setProductType] = useState('');
   const [orderBy, setOrder] = useState('created_at');
   const [sortedBy, setColumn] = useState<SortOrder>(SortOrder.Desc);
-  const [visible, setVisible] = useState(true);
 
   const toggleVisible = () => {
     setVisible((v) => !v);
@@ -42,9 +47,9 @@ export default function ProductsPage() {
     language: locale,
     limit: 20,
     page,
-    type,
-    categories: category,
-    product_type: productType,
+    type__slug: type,
+    // categories: category,
+    // product_type: productType,
     name: searchTerm,
     orderBy,
     sortedBy,

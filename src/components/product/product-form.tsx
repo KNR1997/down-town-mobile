@@ -1,63 +1,63 @@
-import Input from '@/components/ui/input';
-import TextArea from '@/components/ui/text-area';
-import {
-  useForm,
-  useFieldArray,
-  FormProvider,
-  Controller,
-} from 'react-hook-form';
-import Button from '@/components/ui/button';
-import Description from '@/components/ui/description';
-import Card from '@/components/common/card';
-import Label from '@/components/ui/label';
-import Radio from '@/components/ui/radio/radio';
-import { useRouter } from 'next/router';
-import { yupResolver } from '@hookform/resolvers/yup';
-import FileInput from '@/components/ui/file-input';
-import { productValidationSchema } from '@/components/product/product-validation-schema';
-import ProductVariableForm from '@/components/product/product-variable-form';
-import ProductSimpleForm from '@/components/product/product-simple-form';
-import ProductGroupInput from '@/components/product/product-group-input';
-import ProductCategoryInput from '@/components/product/product-category-input';
-import ProductTypeInput from '@/components/product/product-type-input';
-import { ProductType, Product, ProductStatus } from '@/types';
-import { useTranslation } from 'next-i18next';
-import { useShopQuery } from '@/data/shop';
 import cn from 'classnames';
-import ProductTagInput from '@/components/product/product-tag-input';
+import Link from 'next/link';
+import { isEmpty } from 'lodash';
 import { Config } from '@/config';
-import Alert from '@/components/ui/alert';
-import { useEffect, useMemo, useRef, useState, lazy } from 'react';
-import ProductAuthorInput from '@/components/product/product-author-input';
-import ProductManufacturerInput from '@/components/product/product-manufacturer-input';
-import { EditIcon } from '@/components/icons/edit';
+import { useCallback } from 'react';
+import { useRouter } from 'next/router';
+import { useMemo, useState } from 'react';
+import { useShopQuery } from '@/data/shop';
+import { useTranslation } from 'next-i18next';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { useForm, useFieldArray, FormProvider } from 'react-hook-form';
+// validations
+import { productValidationSchema } from '@/components/product/product-validation-schema';
+// types
+import { ItemProps } from '@/types';
+import { ProductType, Product, ProductStatus } from '@/types';
 import {
   getProductDefaultValues,
   getProductInputValues,
   ProductFormValues,
 } from '@/components/product/form-utils';
+// utils
+import { formatSlug } from '@/utils/use-slug';
 import { getErrorMessage } from '@/utils/form-error';
+import { adminOnly, getAuthCredentials, hasAccess } from '@/utils/auth-utils';
+// hooks
 import {
   useCreateProductMutation,
   useUpdateProductMutation,
 } from '@/data/product';
-import { isEmpty } from 'lodash';
-import { adminOnly, getAuthCredentials, hasAccess } from '@/utils/auth-utils';
 import { useSettingsQuery } from '@/data/settings';
 import { useModalAction } from '@/components/ui/modal/modal.context';
-import { useCallback } from 'react';
-import OpenAIButton from '@/components/openAI/openAI.button';
-import { ItemProps } from '@/types';
-import { EyeIcon } from '@/components/icons/category/eyes-icon';
-import { LongArrowPrev } from '@/components/icons/long-arrow-prev';
-import Link from 'next/link';
-import { formatSlug } from '@/utils/use-slug';
-import ProductFlashSaleBox from '@/components/product/product-flash-sale-box';
+// component
+import Alert from '@/components/ui/alert';
+import Input from '@/components/ui/input';
+import Label from '@/components/ui/label';
+import Button from '@/components/ui/button';
+import Card from '@/components/common/card';
+import Radio from '@/components/ui/radio/radio';
+import TextArea from '@/components/ui/text-area';
+import { EditIcon } from '@/components/icons/edit';
+import FileInput from '@/components/ui/file-input';
 import { UpdateIcon } from '@/components/icons/update';
-import StickyFooterPanel from '@/components/ui/sticky-footer-panel';
-import { ProductDescriptionSuggestion } from '@/components/product/product-ai-prompt';
-import RichTextEditor from '@/components/ui/wysiwyg-editor/editor';
+import Description from '@/components/ui/description';
 import TooltipLabel from '@/components/ui/tooltip-label';
+import OpenAIButton from '@/components/openAI/openAI.button';
+import { EyeIcon } from '@/components/icons/category/eyes-icon';
+import StickyFooterPanel from '@/components/ui/sticky-footer-panel';
+import RichTextEditor from '@/components/ui/wysiwyg-editor/editor';
+import { LongArrowPrev } from '@/components/icons/long-arrow-prev';
+import ProductTagInput from '@/components/product/product-tag-input';
+import ProductTypeInput from '@/components/product/product-type-input';
+import ProductGroupInput from '@/components/product/product-group-input';
+import ProductSimpleForm from '@/components/product/product-simple-form';
+import ProductAuthorInput from '@/components/product/product-author-input';
+import ProductVariableForm from '@/components/product/product-variable-form';
+import ProductFlashSaleBox from '@/components/product/product-flash-sale-box';
+import ProductCategoryInput from '@/components/product/product-category-input';
+import { ProductDescriptionSuggestion } from '@/components/product/product-ai-prompt';
+import ProductManufacturerInput from '@/components/product/product-manufacturer-input';
 
 type ProductFormProps = {
   initialValues?: Product | null;
@@ -134,6 +134,7 @@ export default function CreateOrUpdateProductForm({
     const inputValues = {
       language: router.locale,
       ...getProductInputValues(values, initialValues),
+      slug: slugAutoSuggest,
     };
 
     try {
@@ -151,7 +152,7 @@ export default function CreateOrUpdateProductForm({
         //@ts-ignore
         updateProduct({
           ...inputValues,
-          id: initialValues.id!,
+          id: initialValues.slug!,
           shop_id: initialValues.shop_id!,
         });
       }
@@ -300,7 +301,7 @@ export default function CreateOrUpdateProductForm({
       ) : null}
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit(onSubmit)} noValidate>
-          <div className="flex flex-wrap pb-8 my-5 border-b border-dashed border-border-base sm:my-8">
+          {/* <div className="flex flex-wrap pb-8 my-5 border-b border-dashed border-border-base sm:my-8">
             <Description
               title={t('form:featured-image-title')}
               details={featuredImageInformation}
@@ -309,15 +310,15 @@ export default function CreateOrUpdateProductForm({
 
             <Card className="w-full sm:w-8/12 md:w-2/3">
               <FileInput name="image" control={control} multiple={false} />
-              {/* {errors.image?.message && (
+              {errors.image?.message && (
                 <p className="my-2 text-xs text-red-500">
                   {t(errors?.image?.message!)}
                 </p>
-              )} */}
+              )}
             </Card>
-          </div>
+          </div> */}
 
-          <div className="flex flex-wrap pb-8 my-5 border-b border-dashed border-border-base sm:my-8">
+          {/* <div className="flex flex-wrap pb-8 my-5 border-b border-dashed border-border-base sm:my-8">
             <Description
               title={t('form:gallery-title')}
               details={galleryImageInformation}
@@ -327,9 +328,9 @@ export default function CreateOrUpdateProductForm({
             <Card className="w-full sm:w-8/12 md:w-2/3">
               <FileInput name="gallery" control={control} />
             </Card>
-          </div>
+          </div> */}
 
-          <div className="flex flex-wrap pb-8 my-5 border-b border-dashed border-border-base sm:my-8">
+          {/* <div className="flex flex-wrap pb-8 my-5 border-b border-dashed border-border-base sm:my-8">
             <Description
               title={t('form:video-title')}
               details={t('form:video-help-text')}
@@ -337,7 +338,6 @@ export default function CreateOrUpdateProductForm({
             />
 
             <Card className="w-full sm:w-8/12 md:w-2/3">
-              {/* Video url picker */}
               <div>
                 {fields?.map((item: any, index: number) => (
                   <div
@@ -382,7 +382,7 @@ export default function CreateOrUpdateProductForm({
                 {t('form:button-label-add-video')}
               </Button>
             </Card>
-          </div>
+          </div> */}
 
           <div className="flex flex-wrap pb-8 my-5 border-b border-dashed border-border-base sm:my-8">
             <Description
@@ -416,7 +416,8 @@ export default function CreateOrUpdateProductForm({
 
             <Card className="w-full sm:w-8/12 md:w-2/3">
               <Input
-                label={`${t('form:input-label-name')}*`}
+                required
+                label={t('form:input-label-name')}
                 {...register('name')}
                 error={t(errors.name?.message!)}
                 variant="outline"
@@ -452,7 +453,8 @@ export default function CreateOrUpdateProductForm({
                 />
               )}
               <Input
-                label={`${t('form:input-label-unit')}*`}
+                required
+                label={t('form:input-label-unit')}
                 {...register('unit')}
                 error={t(errors.unit?.message!)}
                 variant="outline"

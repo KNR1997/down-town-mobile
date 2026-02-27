@@ -102,7 +102,7 @@ export class HttpClient {
       .filter(([, value]) => Boolean(value))
       .map(([k, v]) =>
         [
-          'type',
+          // 'type',
           'categories',
           'tags',
           'author',
@@ -113,7 +113,8 @@ export class HttpClient {
           ? `${k}.slug:${v}`
           : ['is_approved'].includes(k)
           ? formatBooleanSearchParam(k, v as boolean)
-          : `${k}:${v}`,
+          // : `${k}:${v}`,
+          : `${v}`,
       )
       .join(';');
   }

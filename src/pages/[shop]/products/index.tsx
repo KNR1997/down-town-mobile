@@ -1,34 +1,38 @@
-import Card from '@/components/common/card';
-import Search from '@/components/common/search';
-import { ArrowDown } from '@/components/icons/arrow-down';
-import { ArrowUp } from '@/components/icons/arrow-up';
-import { MoreIcon } from '@/components/icons/more-icon';
-import ShopLayout from '@/components/layouts/shop';
-import CategoryTypeFilter from '@/components/filters/category-type-filter';
-import ProductList from '@/components/product/product-list';
-import Button from '@/components/ui/button';
-import ErrorMessage from '@/components/ui/error-message';
-import LinkButton from '@/components/ui/link-button';
-import Loader from '@/components/ui/loader/loader';
-import { useModalAction } from '@/components/ui/modal/modal.context';
+import cn from 'classnames';
+import { useState } from 'react';
 import { Config } from '@/config';
 import { Routes } from '@/config/routes';
-import { useProductsQuery } from '@/data/product';
-import { useShopQuery } from '@/data/shop';
-import { useMeQuery } from '@/data/user';
+import { useRouter } from 'next/router';
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+// types
 import { Category, SortOrder, Type } from '@/types';
+// utils
 import {
   adminOnly,
   adminOwnerAndStaffOnly,
   getAuthCredentials,
   hasAccess,
 } from '@/utils/auth-utils';
-import cn from 'classnames';
-import { useTranslation } from 'next-i18next';
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import { useRouter } from 'next/router';
-import { useState } from 'react';
+// hooks
+import { useProductsQuery } from '@/data/product';
+import { useShopQuery } from '@/data/shop';
+import { useMeQuery } from '@/data/user';
+import { useModalAction } from '@/components/ui/modal/modal.context';
+// components
+import Button from '@/components/ui/button';
+import Card from '@/components/common/card';
+import Search from '@/components/common/search';
+import ShopLayout from '@/components/layouts/shop';
+import Loader from '@/components/ui/loader/loader';
+import LinkButton from '@/components/ui/link-button';
+import { ArrowUp } from '@/components/icons/arrow-up';
+import { MoreIcon } from '@/components/icons/more-icon';
+import ErrorMessage from '@/components/ui/error-message';
+import { ArrowDown } from '@/components/icons/arrow-down';
 import PageHeading from '@/components/common/page-heading';
+import ProductList from '@/components/product/product-list';
+import CategoryTypeFilter from '@/components/filters/category-type-filter';
 
 interface ProductTypeOptions {
   name: string;
@@ -37,7 +41,23 @@ interface ProductTypeOptions {
 
 export default function ProductsPage() {
   const router = useRouter();
+  const { t } = useTranslation();
+  const { locale } = useRouter();
+  const { openModal } = useModalAction();
   const { permissions } = getAuthCredentials();
+  // states
+  const [page, setPage] = useState(1);
+  const [type, setType] = useState('');
+  const [category, setCategory] = useState('');
+  const [visible, setVisible] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [productType, setProductType] = useState('');
+  const [orderBy, setOrder] = useState('created_at');
+  const [sortedBy, setColumn] = useState<SortOrder>(SortOrder.Desc);
+
+  const toggleVisible = () => {
+    setVisible((v) => !v);
+  };
   const { data: me } = useMeQuery();
   const {
     query: { shop },
@@ -46,31 +66,16 @@ export default function ProductsPage() {
     slug: shop as string,
   });
   const shopId = shopData?.id!;
-  const { t } = useTranslation();
-  const [searchTerm, setSearchTerm] = useState('');
-  const [type, setType] = useState('');
-  const [category, setCategory] = useState('');
-  const [productType, setProductType] = useState('');
-  const [page, setPage] = useState(1);
-  const [orderBy, setOrder] = useState('created_at');
-  const [sortedBy, setColumn] = useState<SortOrder>(SortOrder.Desc);
-  const [visible, setVisible] = useState(true);
-  const { openModal } = useModalAction();
-  const { locale } = useRouter();
-
-  const toggleVisible = () => {
-    setVisible((v) => !v);
-  };
-
+  // query
   const { products, paginatorInfo, loading, error } = useProductsQuery(
     {
       language: locale,
       name: searchTerm,
       limit: 20,
       shop_id: shopId,
-      type,
-      categories: category,
-      product_type: productType,
+      type__slug: type,
+      // categories: category,
+      // product_type: productType,
       orderBy,
       sortedBy,
       page,

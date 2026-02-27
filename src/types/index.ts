@@ -169,6 +169,7 @@ export interface QueryOptions {
   page?: number;
   orderBy?: string;
   sortedBy?: SortOrder;
+  ordering?: string;
 }
 
 export interface ShopSocialInput {
@@ -253,16 +254,18 @@ export interface Attribute {
 }
 
 export interface AttributeValueInput {
-  id?: number;
+  id?: number | null;
   value: string;
   meta?: string;
+  language?: string;
 }
 
 export interface CreateAttributeInput {
   name: string;
   shop_id: number;
   language?: string;
-  values: AttributeValueInput;
+  values: AttributeValueInput[];
+  deleted_values?: string[];
 }
 
 export interface AttributeValueCreateInput {
@@ -279,7 +282,7 @@ export interface AttributeValue {
   id: string;
   value?: string;
   attribute?: Attribute;
-  products: Product[];
+  products?: Product[];
   pivot?: VariationProductPivot;
   meta?: string;
 }
@@ -858,6 +861,18 @@ export interface CreateTagInput {
   icon?: string;
 }
 
+export interface Customer {
+  id: string;
+  name: string;
+  email: string;
+}
+
+export interface CreateCustomerInput {
+  name: string;
+  email: string;
+  password: string;
+}
+
 export interface Author {
   bio?: string;
   born?: string;
@@ -1029,7 +1044,7 @@ export interface CreateManufacturerInput {
   shop_id?: string;
   language?: string;
   socials?: ShopSocialInput[];
-  type_id: string;
+  type: string;
   website?: string;
 }
 
@@ -1771,6 +1786,7 @@ export interface UserProfileInput {
 
 export interface CategoryQueryOptions extends QueryOptions {
   type: string;
+  type__slug: string;
   name: string;
   parent: number | null;
   self: string;
@@ -1782,8 +1798,13 @@ export interface ConversationQueryOptions extends QueryOptions {
 
 export interface TagQueryOptions extends QueryOptions {
   type: string;
+  type__slug: string;
   name: string;
   parent: number | null;
+}
+
+export interface CustomerQueryOptions extends QueryOptions {
+  name: string;
 }
 
 export interface InvoiceTranslatedText {
@@ -1847,6 +1868,7 @@ export interface AnalyticsQueryOptions extends QueryOptions {
 
 export interface ProductQueryOptions extends QueryOptions {
   type: string;
+  type__slug: string;
   name: string;
   categories: string;
   tags: string;
@@ -2034,6 +2056,8 @@ export interface TaxPaginator extends PaginatorInfo<Tax> {}
 export interface ReviewPaginator extends PaginatorInfo<Review> {}
 
 export interface TagPaginator extends PaginatorInfo<Tag> {}
+
+export interface CustomerPaginator extends PaginatorInfo<Customer> {}
 
 export interface AttributePaginator extends PaginatorInfo<Attribute> {}
 

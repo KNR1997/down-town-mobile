@@ -1,4 +1,3 @@
-import Input from '@/components/ui/input';
 import {
   Control,
   FieldErrors,
@@ -6,25 +5,20 @@ import {
   useFormState,
   useWatch,
 } from 'react-hook-form';
-import Button from '@/components/ui/button';
-import TextArea from '@/components/ui/text-area';
-import Label from '@/components/ui/label';
-import Card from '@/components/common/card';
-import Description from '@/components/ui/description';
-import * as categoriesIcon from '@/components/icons/category';
-import { EditIcon } from '@/components/icons/edit';
-import { getIcon } from '@/utils/get-icon';
-import { useRouter } from 'next/router';
 import { Config } from '@/config';
-import ValidationError from '@/components/ui/form-validation-error';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Category, ItemProps } from '@/types';
-import { categoryIcons } from './category-icons';
-import { useTranslation } from 'next-i18next';
-import FileInput from '@/components/ui/file-input';
-import SelectInput from '@/components/ui/select-input';
+import { join, split } from 'lodash';
+import { useRouter } from 'next/router';
 import { yupResolver } from '@hookform/resolvers/yup';
+import { getIcon } from '@/utils/get-icon';
+import { formatSlug } from '@/utils/use-slug';
+import { useTranslation } from 'next-i18next';
+import { Category, ItemProps } from '@/types';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+// icons
+import { categoryIcons } from './category-icons';
+// validations
 import { categoryValidationSchema } from './category-validation-schema';
+// hooks
 import {
   useCategoriesQuery,
   useCreateCategoryMutation,
@@ -32,11 +26,21 @@ import {
 } from '@/data/category';
 import { useTypesQuery } from '@/data/type';
 import { useSettingsQuery } from '@/data/settings';
-import { useModalAction } from '@/components/ui/modal/modal.context';
+// components
+import Label from '@/components/ui/label';
+import Input from '@/components/ui/input';
+import Card from '@/components/common/card';
+import Button from '@/components/ui/button';
+import TextArea from '@/components/ui/text-area';
+import { EditIcon } from '@/components/icons/edit';
+import FileInput from '@/components/ui/file-input';
+import Description from '@/components/ui/description';
+import SelectInput from '@/components/ui/select-input';
 import OpenAIButton from '@/components/openAI/openAI.button';
-import { join, split } from 'lodash';
-import { formatSlug } from '@/utils/use-slug';
+import * as categoriesIcon from '@/components/icons/category';
+import ValidationError from '@/components/ui/form-validation-error';
 import StickyFooterPanel from '@/components/ui/sticky-footer-panel';
+import { useModalAction } from '@/components/ui/modal/modal.context';
 import { CategoryDetailSuggestion } from '@/components/category/category-ai-prompt';
 
 export const updatedIcons = categoryIcons.map((item: any) => {
@@ -143,7 +147,7 @@ const defaultValues = {
   details: '',
   parent: '',
   icon: '',
-  type: '',
+  // type: '',
 };
 
 type IProps = {
@@ -222,8 +226,8 @@ export default function CreateOrUpdateCategoriesForm({
   const onSubmit = async (values: FormValues) => {
     const input = {
       language: router.locale,
+      slug: slugAutoSuggest,
       name: values.name,
-      slug: values.slug,
       details: values.details,
       image: {
         thumbnail: values?.image?.thumbnail,
@@ -232,7 +236,7 @@ export default function CreateOrUpdateCategoriesForm({
       },
       icon: values.icon?.value || '',
       parent: values.parent?.id ?? null,
-      type_id: values.type?.id,
+      type: values.type?.id,
     };
     if (
       !initialValues ||
@@ -245,14 +249,14 @@ export default function CreateOrUpdateCategoriesForm({
     } else {
       updateCategory({
         ...input,
-        id: initialValues.id!,
+        id: initialValues.slug!,
       });
     }
   };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <div className="flex flex-wrap pb-8 my-5 border-b border-dashed border-border-base sm:my-8">
+      {/* <div className="flex flex-wrap pb-8 my-5 border-b border-dashed border-border-base sm:my-8">
         <Description
           title={t('form:input-label-image')}
           details={t('form:category-image-helper-text')}
@@ -262,7 +266,7 @@ export default function CreateOrUpdateCategoriesForm({
         <Card className="w-full sm:w-8/12 md:w-2/3">
           <FileInput name="image" control={control} multiple={false} />
         </Card>
-      </div>
+      </div> */}
 
       <div className="flex flex-wrap my-5 sm:my-8">
         <Description

@@ -1,21 +1,18 @@
-import { Permission } from '@/types';
-import { toast } from 'react-toastify';
-import { useRouter } from 'next/router';
-import { Routes } from '@/config/routes';
-import { useForm } from 'react-hook-form';
-import { useTranslation } from 'next-i18next';
-import { yupResolver } from '@hookform/resolvers/yup';
-// validations
-import { customerValidationSchema } from './user-validation-schema';
-// hooks
-import { useCreateCustomerMutation } from '@/data/customer';
-// components
-import Input from '@/components/ui/input';
 import Button from '@/components/ui/button';
+import Input from '@/components/ui/input';
+import PasswordInput from '@/components/ui/password-input';
+import { useForm } from 'react-hook-form';
 import Card from '@/components/common/card';
 import Description from '@/components/ui/description';
-import PasswordInput from '@/components/ui/password-input';
+import { useRegisterMutation } from '@/data/user';
+import { useTranslation } from 'next-i18next';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { customerValidationSchema } from './customer-validation-schema';
+import { Permission } from '@/types';
 import StickyFooterPanel from '@/components/ui/sticky-footer-panel';
+import { useRouter } from 'next/router';
+import { Routes } from '@/config/routes';
+import { toast } from 'react-toastify';
 
 type FormValues = {
   name: string;
@@ -32,8 +29,7 @@ const defaultValues = {
 const CustomerCreateForm = () => {
   const { t } = useTranslation();
   const router = useRouter();
-  const { mutate: createCustomer, isLoading: creating } =
-    useCreateCustomerMutation();
+  const { mutate: registerUser, isLoading: loading } = useRegisterMutation();
 
   const {
     register,
@@ -47,7 +43,7 @@ const CustomerCreateForm = () => {
   });
 
   async function onSubmit({ name, email, password }: FormValues) {
-    createCustomer(
+    registerUser(
       {
         name,
         email,
@@ -68,7 +64,7 @@ const CustomerCreateForm = () => {
             router.push(Routes.user.list);
           }
         },
-      },
+      }
     );
   }
 
@@ -112,7 +108,7 @@ const CustomerCreateForm = () => {
       </div>
       <StickyFooterPanel className="z-0">
         <div className="mb-4 text-end">
-          <Button loading={creating} disabled={creating}>
+          <Button loading={loading} disabled={loading}>
             {t('form:button-label-create-customer')}
           </Button>
         </div>

@@ -186,6 +186,7 @@ export default function CreateOrUpdateAuthorForm({ initialValues }: IProps) {
   const onSubmit = async (values: FormValues) => {
     const input = {
       ...values,
+      slug: slugAutoSuggest,
       language: router.locale,
       socials: values?.socials
         ? values?.socials?.map((social: any) => ({
@@ -218,7 +219,7 @@ export default function CreateOrUpdateAuthorForm({ initialValues }: IProps) {
       } else {
         updateAuthor({
           ...input,
-          id: initialValues.id!,
+          id: initialValues.slug!,
           shop_id: shopId,
         });
       }
@@ -235,7 +236,7 @@ export default function CreateOrUpdateAuthorForm({ initialValues }: IProps) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <div className="flex flex-wrap pb-8 my-5 border-b border-dashed border-border-base sm:my-8">
+      {/* <div className="flex flex-wrap pb-8 my-5 border-b border-dashed border-border-base sm:my-8">
         <Description
           title={t('form:input-label-image')}
           details={t('form:author-image-helper-text')}
@@ -256,7 +257,7 @@ export default function CreateOrUpdateAuthorForm({ initialValues }: IProps) {
         <Card className="w-full sm:w-8/12 md:w-2/3">
           <FileInput name="cover_image" control={control} multiple={false} />
         </Card>
-      </div>
+      </div> */}
 
       <div className="flex flex-wrap my-5 sm:my-8">
         <Description

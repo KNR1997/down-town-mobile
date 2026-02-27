@@ -196,7 +196,7 @@ export default function CreateOrUpdateManufacturerForm({
     const input = {
       language: router.locale,
       name,
-      slug,
+      slug: slugAutoSuggest,
       description,
       is_approved,
       website,
@@ -216,7 +216,7 @@ export default function CreateOrUpdateManufacturerForm({
         original: cover_image?.original,
         id: cover_image?.id,
       },
-      type_id: type?.id!,
+      type: type?.id!,
     };
     try {
       if (
@@ -231,7 +231,7 @@ export default function CreateOrUpdateManufacturerForm({
       } else {
         updateManufacturer({
           ...input,
-          id: initialValues.id!,
+          id: initialValues.slug!,
           shop_id: shopId,
         });
       }
@@ -248,7 +248,7 @@ export default function CreateOrUpdateManufacturerForm({
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <div className="flex flex-wrap pb-8 my-5 border-b border-dashed border-border-base sm:my-8">
+      {/* <div className="flex flex-wrap pb-8 my-5 border-b border-dashed border-border-base sm:my-8">
         <Description
           title={t('form:input-label-logo')}
           details={t('form:manufacturer-image-helper-text')}
@@ -269,7 +269,7 @@ export default function CreateOrUpdateManufacturerForm({
         <Card className="w-full sm:w-8/12 md:w-2/3">
           <FileInput name="cover_image" control={control} multiple={false} />
         </Card>
-      </div>
+      </div> */}
 
       <div className="flex flex-wrap my-5 sm:my-8">
         <Description

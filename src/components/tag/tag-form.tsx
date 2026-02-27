@@ -1,31 +1,38 @@
-import Input from '@/components/ui/input';
-import { Control, FieldErrors, useForm } from 'react-hook-form';
-import Button from '@/components/ui/button';
-import TextArea from '@/components/ui/text-area';
-import Label from '@/components/ui/label';
-import Card from '@/components/common/card';
-import Description from '@/components/ui/description';
-import * as categoriesIcon from '@/components/icons/category';
-import { getIcon } from '@/utils/get-icon';
 import { useRouter } from 'next/router';
-import { getErrorMessage } from '@/utils/form-error';
-import ValidationError from '@/components/ui/form-validation-error';
-import { tagIcons } from './tag-icons';
+import { getIcon } from '@/utils/get-icon';
 import { useTranslation } from 'next-i18next';
-import FileInput from '@/components/ui/file-input';
-import SelectInput from '@/components/ui/select-input';
+import { getErrorMessage } from '@/utils/form-error';
+import { Control, FieldErrors, useForm } from 'react-hook-form';
+// config
+import { Config } from '@/config';
+// utils
+import { formatSlug } from '@/utils/use-slug';
+// icons
+import { tagIcons } from './tag-icons';
 import { yupResolver } from '@hookform/resolvers/yup';
+// validations
 import { tagValidationSchema } from './tag-validation-schema';
-import { useCreateTagMutation, useUpdateTagMutation } from '@/data/tag';
+// types
+import { ItemProps } from '@/types';
+// hooks
 import { useTypesQuery } from '@/data/type';
-import OpenAIButton from '../openAI/openAI.button';
 import { useSettingsQuery } from '@/data/settings';
 import { useCallback, useMemo, useState } from 'react';
-import { ItemProps } from '@/types';
 import { useModalAction } from '../ui/modal/modal.context';
+import { useCreateTagMutation, useUpdateTagMutation } from '@/data/tag';
+// components
+import Input from '@/components/ui/input';
+import Label from '@/components/ui/label';
+import Button from '@/components/ui/button';
+import Card from '@/components/common/card';
+import TextArea from '@/components/ui/text-area';
+import OpenAIButton from '../openAI/openAI.button';
+import FileInput from '@/components/ui/file-input';
 import { EditIcon } from '@/components/icons/edit';
-import { Config } from '@/config';
-import { formatSlug } from '@/utils/use-slug';
+import SelectInput from '@/components/ui/select-input';
+import Description from '@/components/ui/description';
+import * as categoriesIcon from '@/components/icons/category';
+import ValidationError from '@/components/ui/form-validation-error';
 import StickyFooterPanel from '@/components/ui/sticky-footer-panel';
 import { TagDetailSuggestions } from '@/components/tag/tag-ai-prompt';
 
@@ -163,7 +170,7 @@ export default function CreateOrUpdateTagForm({ initialValues }: IProps) {
     const input = {
       language: router.locale,
       name: values.name,
-      slug: values.slug,
+      slug: slugAutoSuggest,
       details: values.details,
       image: {
         thumbnail: values?.image?.thumbnail,
@@ -171,7 +178,7 @@ export default function CreateOrUpdateTagForm({ initialValues }: IProps) {
         id: values?.image?.id,
       },
       icon: values.icon?.value ?? '',
-      type_id: values.type?.id,
+      type: values.type?.id,
     };
 
     try {
@@ -186,7 +193,7 @@ export default function CreateOrUpdateTagForm({ initialValues }: IProps) {
       } else {
         updateTag({
           ...input,
-          id: initialValues.id!,
+          id: initialValues.slug!,
         });
       }
     } catch (err) {
@@ -196,7 +203,7 @@ export default function CreateOrUpdateTagForm({ initialValues }: IProps) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <div className="flex flex-wrap pb-8 my-5 border-b border-gray-300 border-dashed sm:my-8">
+      {/* <div className="flex flex-wrap pb-8 my-5 border-b border-gray-300 border-dashed sm:my-8">
         <Description
           title={t('form:input-label-image')}
           details={t('form:tag-image-helper-text')}
@@ -206,7 +213,7 @@ export default function CreateOrUpdateTagForm({ initialValues }: IProps) {
         <Card className="w-full sm:w-8/12 md:w-2/3">
           <FileInput name="image" control={control} multiple={false} />
         </Card>
-      </div>
+      </div> */}
 
       <div className="flex flex-wrap my-5 sm:my-8">
         <Description

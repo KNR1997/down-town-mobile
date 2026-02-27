@@ -38,7 +38,7 @@ export const useCreateProductMutation = () => {
         const errorMessage: any = Object.values(data).flat();
         toast.error(errorMessage[0]);
       } else {
-        toast.error(t(`common:${error?.response?.data.message}`));
+        toast.error(t(`common:${error?.response?.data.error}`));
       }
     },
   });
@@ -67,7 +67,8 @@ export const useUpdateProductMutation = () => {
       queryClient.invalidateQueries(API_ENDPOINTS.PRODUCTS);
     },
     onError: (error: any) => {
-      toast.error(t(`common:${error?.response?.data.message}`));
+      // toast.error(t(`common:${error?.response?.data.message}`));
+      toast.error(error?.response?.data.error);
     },
   });
 };

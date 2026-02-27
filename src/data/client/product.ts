@@ -21,6 +21,7 @@ export const productClient = {
   },
   paginated: ({
     type,
+    type__slug,
     name,
     categories,
     shop_id,
@@ -30,16 +31,18 @@ export const productClient = {
   }: Partial<ProductQueryOptions>) => {
     return HttpClient.get<ProductPaginator>(API_ENDPOINTS.PRODUCTS, {
       searchJoin: 'and',
-      with: 'shop;type;categories',
-      shop_id,
+      // with: 'shop;type;categories',
+      // shop_id,
+      self,
       ...params,
+      type__slug,
       search: HttpClient.formatSearchParams({
-        type,
+        // type,
         name,
-        categories,
-        shop_id,
-        product_type,
-        status,
+        // categories,
+        // shop_id,
+        // product_type,
+        // status,
       }),
     });
   },

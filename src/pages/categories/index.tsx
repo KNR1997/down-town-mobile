@@ -1,36 +1,38 @@
-import CategoryList from '@/components/category/category-list';
+import { useState } from 'react';
+import { Config } from '@/config';
+import { useRouter } from 'next/router';
+import { Routes } from '@/config/routes';
+import { Type } from '@/types';
+import { useTranslation } from 'next-i18next';
+import { adminOnly } from '@/utils/auth-utils';
+import { useCategoriesQuery } from '@/data/category';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+// components
 import Card from '@/components/common/card';
 import Layout from '@/components/layouts/admin';
 import Search from '@/components/common/search';
-import LinkButton from '@/components/ui/link-button';
-import { useState } from 'react';
-import ErrorMessage from '@/components/ui/error-message';
 import Loader from '@/components/ui/loader/loader';
-import { SortOrder, Type } from '@/types';
-import { useTranslation } from 'next-i18next';
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import { Routes } from '@/config/routes';
+import LinkButton from '@/components/ui/link-button';
+import ErrorMessage from '@/components/ui/error-message';
 import TypeFilter from '@/components/category/type-filter';
-import { adminOnly } from '@/utils/auth-utils';
-import { useCategoriesQuery } from '@/data/category';
-import { useRouter } from 'next/router';
-import { Config } from '@/config';
 import PageHeading from '@/components/common/page-heading';
+import CategoryList from '@/components/category/category-list';
+
 export default function Categories() {
   const { locale } = useRouter();
-  const [searchTerm, setSearchTerm] = useState('');
+  const { t } = useTranslation();
+  // states
   const [type, setType] = useState('');
   const [page, setPage] = useState(1);
-  const { t } = useTranslation();
-  const [orderBy, setOrder] = useState('created_at');
-  const [sortedBy, setColumn] = useState<SortOrder>(SortOrder.Desc);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [ordering, setOrdering] = useState('created_at');
+  // query
   const { categories, paginatorInfo, loading, error } = useCategoriesQuery({
     limit: 20,
     page,
-    type,
+    type__slug: type,
     name: searchTerm,
-    orderBy,
-    sortedBy,
+    ordering,
     parent: null,
     language: locale,
   });
@@ -89,8 +91,7 @@ export default function Categories() {
         categories={categories}
         paginatorInfo={paginatorInfo}
         onPagination={handlePagination}
-        onOrder={setOrder}
-        onSort={setColumn}
+        onOrdering={setOrdering}
       />
     </>
   );
