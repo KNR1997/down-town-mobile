@@ -38,7 +38,8 @@ export const useCreateProductMutation = () => {
         const errorMessage: any = Object.values(data).flat();
         toast.error(errorMessage[0]);
       } else {
-        toast.error(t(`common:${error?.response?.data.error}`));
+        // toast.error(t(`common:${error?.response?.data.error}`));
+        toast.error(error?.response?.data.error);
       }
     },
   });

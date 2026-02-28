@@ -146,14 +146,14 @@ export default function CreateOrUpdateProductForm({
         createProduct({
           ...inputValues,
           ...(initialValues?.slug && { slug: initialValues.slug }),
-          shop_id: shopId || initialValues?.shop_id,
+          shop: shopId || initialValues?.shop_id,
         });
       } else {
         //@ts-ignore
         updateProduct({
           ...inputValues,
           id: initialValues.slug!,
-          shop_id: initialValues.shop_id!,
+          shop: initialValues.shop_id!,
         });
       }
     } catch (error) {

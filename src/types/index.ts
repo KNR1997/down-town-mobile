@@ -243,6 +243,45 @@ export interface Category {
   updated_at: string;
 }
 
+export interface CreateWarehouseInput {
+  name: string;
+  code: string;
+  address: string;
+}
+
+export interface Warehouse {
+  id: string;
+  name: string;
+  code: string;
+  is_active: boolean;
+}
+
+export interface CreateSupplierInput {
+  name: string;
+  email: string;
+  address: string;
+}
+
+export interface Supplier {
+  id: string;
+  name: string;
+  code: string;
+  is_active: boolean;
+}
+
+export interface CreatePurchaseInput {
+  name: string;
+  email: string;
+  address: string;
+}
+
+export interface Purchase {
+  id: string;
+  name: string;
+  code: string;
+  is_active: boolean;
+}
+
 export interface Attribute {
   id: string;
   name: string;
@@ -804,7 +843,7 @@ export interface CreateProduct {
   height?: string;
   length?: string;
   width?: string;
-  shop_id?: string;
+  shop?: string;
   in_flash_sale: boolean;
 }
 
@@ -1792,6 +1831,18 @@ export interface CategoryQueryOptions extends QueryOptions {
   self: string;
 }
 
+export interface WarehouseQueryOptions extends QueryOptions {
+  name: string;
+}
+
+export interface SupplierQueryOptions extends QueryOptions {
+  name: string;
+}
+
+export interface PurchaseQueryOptions extends QueryOptions {
+  name: string;
+}
+
 export interface ConversationQueryOptions extends QueryOptions {
   search?: string;
 }
@@ -1871,6 +1922,7 @@ export interface ProductQueryOptions extends QueryOptions {
   type__slug: string;
   name: string;
   categories: string;
+  categories__slug: string;
   tags: string;
   author: string;
   price: string;
@@ -2050,6 +2102,12 @@ export interface TermsAndConditionsPaginator
 export interface ProductPaginator extends PaginatorInfo<Product> {}
 
 export interface CategoryPaginator extends PaginatorInfo<Category> {}
+
+export interface WarehousePaginator extends PaginatorInfo<Warehouse> {}
+
+export interface SupplierPaginator extends PaginatorInfo<Supplier> {}
+
+export interface PurchasePaginator extends PaginatorInfo<Purchase> {}
 
 export interface TaxPaginator extends PaginatorInfo<Tax> {}
 

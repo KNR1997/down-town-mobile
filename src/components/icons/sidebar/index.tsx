@@ -44,4 +44,7 @@ export { TermsIcon } from '@/components/icons/sidebar/terms';
 export { LogOutIcon } from '@/components/icons/logout';
 export { MyShopOwnerIcon } from '@/components/icons/sidebar/my-shop';
 export { ChatOwnerIcon } from '@/components/icons/sidebar/chat';
+export { WarehouseIcon } from '@/components/icons/sidebar/warehouse';
+export { PurchaseIcon } from '@/components/icons/sidebar/purchase';
+export { SupplyIcon } from '@/components/icons/sidebar/supply';
 export { StoreNoticeOwnerIcon } from '@/components/icons/sidebar/store-notice';

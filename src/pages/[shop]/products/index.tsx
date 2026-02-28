@@ -74,7 +74,7 @@ export default function ProductsPage() {
       limit: 20,
       shop_id: shopId,
       type__slug: type,
-      // categories: category,
+      categories__slug: category,
       // product_type: productType,
       orderBy,
       sortedBy,

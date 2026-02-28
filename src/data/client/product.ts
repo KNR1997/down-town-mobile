@@ -24,6 +24,7 @@ export const productClient = {
     type__slug,
     name,
     categories,
+    categories__slug,
     shop_id,
     product_type,
     status,
@@ -32,10 +33,11 @@ export const productClient = {
     return HttpClient.get<ProductPaginator>(API_ENDPOINTS.PRODUCTS, {
       searchJoin: 'and',
       // with: 'shop;type;categories',
-      // shop_id,
+      shop_id,
       self,
       ...params,
       type__slug,
+      categories__slug,
       search: HttpClient.formatSearchParams({
         // type,
         name,
@@ -85,7 +87,7 @@ export const productClient = {
         name,
         ...params,
         search: HttpClient.formatSearchParams({
-          status,
+          // status,
           name,
         }),
       },

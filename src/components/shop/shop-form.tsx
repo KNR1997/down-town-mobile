@@ -1,18 +1,16 @@
-import Card from '@/components/common/card';
-import GooglePlacesAutocomplete from '@/components/form/google-places-autocomplete';
-import { EditIcon } from '@/components/icons/edit';
-import * as socialIcons from '@/components/icons/social';
-import Button from '@/components/ui/button';
-import Description from '@/components/ui/description';
-import FileInput from '@/components/ui/file-input';
-import Input from '@/components/ui/input';
-import Label from '@/components/ui/label';
-import SelectInput from '@/components/ui/select-input';
-import SwitchInput from '@/components/ui/switch-input';
-import TextArea from '@/components/ui/text-area';
+import omit from 'lodash/omit';
+import { useAtom } from 'jotai';
 import { Config } from '@/config';
+import { useRouter } from 'next/router';
+import { join, split } from 'lodash';
+import { useTranslation } from 'next-i18next';
 import { useSettingsQuery } from '@/data/settings';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { useCallback, useMemo, useState } from 'react';
+import { addDays, addMinutes, isSameDay, isToday } from 'date-fns';
+// hooks
 import { useCreateShopMutation, useUpdateShopMutation } from '@/data/shop';
+// types
 import {
   BalanceInput,
   IImage,
@@ -23,29 +21,36 @@ import {
   UserAddressInput,
   Attachment,
 } from '@/types';
-import { getAuthCredentials } from '@/utils/auth-utils';
-import { STAFF, STORE_OWNER, SUPER_ADMIN } from '@/utils/constants';
-import { getFormattedImage } from '@/utils/get-formatted-image';
-import { getIcon } from '@/utils/get-icon';
-import { yupResolver } from '@hookform/resolvers/yup';
-import { join, split } from 'lodash';
-import omit from 'lodash/omit';
-import { useTranslation } from 'next-i18next';
-import { useRouter } from 'next/router';
-import { useCallback, useMemo, useState } from 'react';
-import { Controller, useFieldArray, useForm, useWatch } from 'react-hook-form';
-import OpenAIButton from '../openAI/openAI.button';
-import { useAtom } from 'jotai';
-import { locationAtom } from '@/utils/use-location';
-import { useModalAction } from '../ui/modal/modal.context';
+// validations
 import { shopValidationSchema } from './shop-validation-schema';
+// utils
+import { getIcon } from '@/utils/get-icon';
 import { formatSlug } from '@/utils/use-slug';
-import StickyFooterPanel from '@/components/ui/sticky-footer-panel';
+import { locationAtom } from '@/utils/use-location';
 import { socialIcon } from '@/settings/site.settings';
-import { ShopDescriptionSuggestion } from '@/components/shop/shop-ai-prompt';
-import PhoneNumberInput from '@/components/ui/phone-input';
+import { getAuthCredentials } from '@/utils/auth-utils';
+import { getFormattedImage } from '@/utils/get-formatted-image';
+import { STAFF, STORE_OWNER, SUPER_ADMIN } from '@/utils/constants';
+import { Controller, useFieldArray, useForm, useWatch } from 'react-hook-form';
+// components
+import Card from '@/components/common/card';
+import Button from '@/components/ui/button';
+import Input from '@/components/ui/input';
+import Label from '@/components/ui/label';
+import TextArea from '@/components/ui/text-area';
+import OpenAIButton from '../openAI/openAI.button';
+import { EditIcon } from '@/components/icons/edit';
+import FileInput from '@/components/ui/file-input';
 import DatePicker from '@/components/ui/date-picker';
-import { addDays, addMinutes, isSameDay, isToday } from 'date-fns';
+import Description from '@/components/ui/description';
+import SelectInput from '@/components/ui/select-input';
+import SwitchInput from '@/components/ui/switch-input';
+import * as socialIcons from '@/components/icons/social';
+import { useModalAction } from '../ui/modal/modal.context';
+import PhoneNumberInput from '@/components/ui/phone-input';
+import StickyFooterPanel from '@/components/ui/sticky-footer-panel';
+import { ShopDescriptionSuggestion } from '@/components/shop/shop-ai-prompt';
+import GooglePlacesAutocomplete from '@/components/form/google-places-autocomplete';
 
 // const socialIcon = [
 //   {
@@ -201,7 +206,7 @@ const ShopForm = ({ initialValues }: { initialValues?: Shop }) => {
     if (initialValues) {
       const { ...restAddress } = values.address;
       updateShop({
-        id: initialValues?.id as string,
+        id: initialValues?.slug as string,
         ...values,
         address: restAddress,
         settings,
@@ -259,7 +264,7 @@ const ShopForm = ({ initialValues }: { initialValues?: Shop }) => {
   return (
     <>
       <form onSubmit={handleSubmit(onSubmit)} noValidate>
-        <div className="flex flex-wrap pb-8 my-5 border-b border-dashed border-border-base sm:my-8">
+        {/* <div className="flex flex-wrap pb-8 my-5 border-b border-dashed border-border-base sm:my-8">
           <Description
             title={t('form:input-label-logo')}
             details={t('form:shop-logo-help-text')}
@@ -269,9 +274,9 @@ const ShopForm = ({ initialValues }: { initialValues?: Shop }) => {
           <Card className="w-full sm:w-8/12 md:w-2/3">
             <FileInput name="logo" control={control} multiple={false} />
           </Card>
-        </div>
+        </div> */}
 
-        <div className="flex flex-wrap pb-8 my-5 border-b border-dashed border-border-base sm:my-8">
+        {/* <div className="flex flex-wrap pb-8 my-5 border-b border-dashed border-border-base sm:my-8">
           <Description
             title={t('form:shop-cover-image-title')}
             details={coverImageInformation}
@@ -281,7 +286,7 @@ const ShopForm = ({ initialValues }: { initialValues?: Shop }) => {
           <Card className="w-full sm:w-8/12 md:w-2/3">
             <FileInput name="cover_image" control={control} multiple={false} />
           </Card>
-        </div>
+        </div> */}
         <div className="flex flex-wrap pb-8 my-5 border-b border-dashed border-border-base sm:my-8">
           <Description
             title={t('form:shop-basic-info')}
@@ -691,7 +696,7 @@ const ShopForm = ({ initialValues }: { initialValues?: Shop }) => {
         ) : (
           ''
         )}
-           {!permissions?.includes(SUPER_ADMIN) &&
+        {!permissions?.includes(SUPER_ADMIN) &&
         !permissions?.includes(STAFF) &&
         !Boolean(initialValues?.is_active) &&
         Boolean(options?.isMultiCommissionRate) ? (
