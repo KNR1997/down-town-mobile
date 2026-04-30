@@ -43,6 +43,7 @@ const LoginForm = () => {
       },
       {
         onSuccess: (data) => {
+          console.log('data--------------: ', data)
           if (data?.token) {
             if (hasAccess(allowedRoles, data?.permissions)) {
               setAuthCredentials(data?.token, data?.permissions, data?.role);

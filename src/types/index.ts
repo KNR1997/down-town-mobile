@@ -453,7 +453,7 @@ export interface User {
   created_at: string;
   updated_at: string;
   profile?: Profile;
-  address: Address[];
+  addresses: Address[];
   orders?: OrderPaginator;
   email_verified: boolean;
 }
@@ -672,7 +672,7 @@ export interface Order {
   wallet_point?: WalletPoint;
   delivery_fee?: number;
   delivery_time: string;
-  products: Product[];
+  items: Product[];
   created_at: string;
   updated_at: string;
   billing_address?: UserAddress;

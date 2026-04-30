@@ -120,11 +120,11 @@ export default function OrderDetailsPage() {
 
   const { price: amountDue } = usePrice({ amount: amountPayable });
 
-  const totalItem = order?.products.reduce(
-    // @ts-ignore
-    (initial = 0, p) => initial + parseInt(p?.pivot?.order_quantity!),
-    0
-  );
+  // const totalItem = order?.products.reduce(
+  //   // @ts-ignore
+  //   (initial = 0, p) => initial + parseInt(p?.pivot?.order_quantity!),
+  //   0
+  // );
 
   const phoneNumber = useFormatPhoneNumber({
     customer_contact: order?.customer_contact as string,
@@ -163,27 +163,27 @@ export default function OrderDetailsPage() {
     },
     {
       title: t('table:table-item-products'),
-      dataIndex: 'name',
-      key: 'name',
+      dataIndex: 'product_name',
+      key: 'product_name',
       align: alignLeft,
-      render: (name: string, item: any) => (
+      render: (product_name: string, item: any) => (
         <div>
-          <span>{name}</span>
+          <span>{product_name}</span>
           <span className="mx-2">x</span>
           <span className="font-semibold text-heading">
-            {item.pivot.order_quantity}
+            {item.order_quantity}
           </span>
         </div>
       ),
     },
     {
       title: t('table:table-item-total'),
-      dataIndex: 'price',
-      key: 'price',
+      dataIndex: 'unit_price',
+      key: 'unit_price',
       align: alignRight,
       render: function Render(_: any, item: any) {
         const { price } = usePrice({
-          amount: parseFloat(item.pivot.subtotal),
+          amount: parseFloat(item.subtotal),
         });
         return <span>{price}</span>;
       },
@@ -267,7 +267,7 @@ export default function OrderDetailsPage() {
                   </p>
                 </div>
               )}
-              data={order?.products!}
+              data={order?.items!}
               rowKey="id"
               scroll={{ x: 300 }}
             />
@@ -351,7 +351,7 @@ export default function OrderDetailsPage() {
 
             <div className="flex flex-col items-start space-y-1 text-sm text-body">
               <span>
-                {formatString(order?.products?.length, t('text-item'))}
+                {formatString(order?.items?.length, t('text-item'))}
               </span>
               <span>{order?.delivery_time}</span>
               <span>

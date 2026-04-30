@@ -122,13 +122,13 @@ const OrderList = ({
         </div>
       ),
     },
-    {
-      title: t('table:table-item-products'),
-      dataIndex: 'products',
-      key: 'products',
-      align: 'center',
-      render: (products: Product) => <span>{products.length}</span>,
-    },
+    // {
+    //   title: t('table:table-item-products'),
+    //   dataIndex: 'products',
+    //   key: 'products',
+    //   align: 'center',
+    //   render: (products: Product) => <span>{products.length}</span>,
+    // },
     {
       // title: t('table:table-item-order-date'),
       title: (

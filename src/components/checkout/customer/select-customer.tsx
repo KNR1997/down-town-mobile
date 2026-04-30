@@ -14,6 +14,7 @@ const AddOrUpdateCheckoutCustomer = () => {
   const [selectedCustomer, setCustomer] = useAtom(customerAtom);
 
   function onCustomerUpdate(customer: any) {
+    console.log('customer-------------: ', customer)
     setCustomer(customer);
     closeModal();
   }

@@ -30,12 +30,16 @@ const RightSideView = dynamic(
 export default function CheckoutPage() {
   const [customer] = useAtom(customerAtom);
   const { t } = useTranslation();
+  console.log('customer in CheckoutPage----------: ', customer)
 
   const {
     data: user,
     isLoading: loading,
     refetch,
   } = useUserQuery({ id: customer?.value });
+
+  console.log('user----------: ', user)
+
   useEffect(() => {
     if (customer?.value) {
       refetch(customer?.value);
@@ -69,7 +73,7 @@ export default function CheckoutPage() {
             label={t('text-billing-address')}
             count={2}
             //@ts-ignore
-            addresses={user?.address?.filter(
+            addresses={user?.addresses?.filter(
               (address) => address?.type === AddressType.Billing
             )}
             //@ts-ignore
@@ -82,7 +86,7 @@ export default function CheckoutPage() {
             label={t('text-shipping-address')}
             count={3}
             //@ts-ignore
-            addresses={user?.address?.filter(
+            addresses={user?.addresses?.filter(
               (address) => address?.type === AddressType.Shipping
             )}
             //@ts-ignore
